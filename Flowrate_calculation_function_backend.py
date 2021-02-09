@@ -1,192 +1,110 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Enter Tank Name:59TK57G\n",
-      "Enter the Tank factor:1.164\n",
-      "Enter the Batch size to pump: 15000\n",
-      "Enter the Initial Time in hour: 6\n",
-      "Enter the initial Minute time: 0\n",
-      "Enter the Final time in hour: 11\n",
-      "Enter the Final Minute time: 40\n",
-      "Enter the initial tank level: 12870\n",
-      "Enter the final Tank level: 11622\n",
-      "\n",
-      "*************************Flow Result for 59TK57G **********************\n",
-      "Start-up Time:6:0\n",
-      "Shut-down Time:11:40\n",
-      "\n",
-      "General Flow-Rate Value is 256.3539 m3/hr ~~ 256 m3/hr\n",
-      "Flow-Rate at Initial Minute of 0 minute= 0.0 m3/min\n",
-      "Flow-Rate at Final Minute of 40 minute of 11 : 40 = 170.9026 m3/hr ~~ 171 m3/hr\n",
-      "\n",
-      "Time(hr), Volume(m3), Flow-rate(m3/hr),             Net-to-Pump(m3),     Accumulation(m3)\n",
-      "0         14980       256.3538823529409               15000              3946\n",
-      "1         14724       256.3538823529409               14743              4202\n",
-      "2         14467       256.3538823529409               14487              4458\n",
-      "3         14211       256.3538823529409               14230              4715\n",
-      "4         13955       256.3538823529409               13974              4971\n",
-      "5         13698       256.3538823529409               13718              5227\n",
-      "\n",
-      "New Tank Levels(mm):\n",
-      "12870.0\n",
-      "12649.765\n",
-      "12429.529\n",
-      "12209.294\n",
-      "11989.059\n",
-      "11768.824\n",
-      "\n",
-      "Total volume of Product Discharged (ACCUMULATION): 1709.0259 m3\n",
-      "\n",
-      "Total volume of product remaining(NET To Pump): 13290.9741 m3\n",
-      "Balance Check of Batch Size: 15000.0\n"
-     ]
-    }
-   ],
-   "source": [
-    "import numpy as np\n",
-    "\n",
-    "#=============================================\n",
-    "\n",
-    "def run():\n",
-    "    tank = input(\"Enter Tank Name:\")\n",
-    "\n",
-    "    #tank_factor\n",
-    "    f = eval(input(\"Enter the Tank factor:\"))\n",
-    "\n",
-    "    #Batch_size\n",
-    "    b = eval(input(\"Enter the Batch size to pump: \"))\n",
-    "\n",
-    "    initial_time = int(input(\"Enter the Initial Time in hour: \"))\n",
-    "    initial_minute = float(input(\"Enter the initial Minute time: \"))\n",
-    "    final_time = int(input(\"Enter the Final time in hour: \"))\n",
-    "    final_minute = float(input(\"Enter the Final Minute time: \"))\n",
-    "\n",
-    "    #initial_level\n",
-    "    l = eval(input(\"Enter the initial tank level: \"))\n",
-    "\n",
-    "    #final_level\n",
-    "    lf = eval(input(\"Enter the final Tank level: \"))\n",
-    "\n",
-    "    #Initial volume\n",
-    "    a = float(l * f)\n",
-    "\n",
-    "    #final_volume\n",
-    "    af = lf * f\n",
-    "\n",
-    "    change_in_minute = final_minute - initial_minute\n",
-    "\n",
-    "    minute_in_hr = change_in_minute / 60\n",
-    "\n",
-    "    #change_in_time\n",
-    "    n = final_time - initial_time\n",
-    "\n",
-    "    change_in_volume = a - af\n",
-    "    total_time = n + minute_in_hr\n",
-    "\n",
-    "    #flow_rate\n",
-    "    d = change_in_volume / total_time\n",
-    "\n",
-    "    New_volumes = []\n",
-    "\n",
-    "    Accumulate = []\n",
-    "\n",
-    "    Net_to_pump = []\n",
-    "\n",
-    "    total = 0\n",
-    "    value = a\n",
-    "    batch = b\n",
-    "    ac = 0\n",
-    "\n",
-    "    print(\"\\n*************************Flow Result for\",tank,\"**********************\")\n",
-    "    print(\"Start-up Time\", initial_time, int(initial_minute), sep=\":\")\n",
-    "\n",
-    "    print(\"Shut-down Time\", final_time, int(final_minute), sep=\":\")\n",
-    "\n",
-    "    print(\"\\nGeneral Flow-Rate Value is\", round(d, 4), 'm3/hr', \"~~\", round(d), 'm3/hr')\n",
-    "\n",
-    "    #flow-rate at initial minute\n",
-    "    fim = (initial_minute / 60) * d\n",
-    "\n",
-    "    #flow_rate_at_final_minute\n",
-    "    ffm = (final_minute / 60) * d\n",
-    "\n",
-    "    print(\"Flow-Rate at Initial Minute of\", int(initial_minute),'minute''=', round(fim, 3),\n",
-    "          'm3/min')\n",
-    "\n",
-    "    print(\"Flow-Rate at Final Minute of\", int(final_minute),'minute of', final_time,':',int(final_minute),'=', round(ffm, 4), 'm3/hr',\n",
-    "          \"~~\", round(ffm), 'm3/hr')\n",
-    "\n",
-    "    print(\"\\nTime(hr), Volume(m3), Flow-rate(m3/hr),             Net-to-Pump(m3),     Accumulation(m3)\")\n",
-    "\n",
-    "    for i in range(n+1):\n",
-    "        print( i,\"       \",\"%d \" %value,\"    \", d, \"             \",\"%d\" %batch,\"            \", \"%d\" %ac, )\n",
-    "        New_volumes.append(value)\n",
-    "        batch = batch - d\n",
-    "        total = total + value\n",
-    "        value = value - d\n",
-    "        ac = ac + d\n",
-    "\n",
-    "        Accumulate.append(d)\n",
-    "\n",
-    "        Net_to_pump.append(d)\n",
-    "\n",
-    "    Levels = np.divide(New_volumes, f)\n",
-    "\n",
-    "    print('\\nNew Tank Levels(mm):')\n",
-    "\n",
-    "    for l in Levels:\n",
-    "        print( round(l,3))\n",
-    "\n",
-    "    dg = sum(Accumulate)+ fim + ffm\n",
-    "    print(\"\\nTotal volume of Product Discharged (ACCUMULATION):\", round(dg, 4), 'm3')\n",
-    "\n",
-    "    rn = b - dg\n",
-    "    print(\"\\nTotal volume of product remaining(NET To Pump):\", round(rn, 4), 'm3')\n",
-    "\n",
-    "    bal= dg + rn\n",
-    "    print(\"Balance Check of Batch Size:\", bal)\n",
-    "\n",
-    "    #new level at final minute = af-fmm, volume, net to pump, accumulation\n",
-    "\n",
-    "run()\n",
-    "\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.7.4"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 2
-}
+#Make sure you have numpy library module installed if not using jupyter note
+import numpy as np
+
+
+#=============================================
+
+def run():
+    tank = input("Enter Tank Name:")
+
+    #tank_factor
+    f = eval(input("Enter the Tank factor:"))
+
+    #Batch_size
+    b = eval(input("Enter the Batch size to pump: "))
+
+    initial_time = int(input("Enter the Initial Time in hour: "))
+    initial_minute = float(input("Enter the initial Minute time: "))
+    final_time = int(input("Enter the Final time in hour: "))
+    final_minute = float(input("Enter the Final Minute time: "))
+
+    #initial_level
+    l = eval(input("Enter the initial tank level: "))
+
+    #final_level
+    lf = eval(input("Enter the final Tank level: "))
+
+    #Initial volume
+    a = float(l * f)
+
+    #final_volume
+    af = lf * f
+
+    change_in_minute = final_minute - initial_minute
+
+    minute_in_hr = change_in_minute / 60
+
+    #change_in_time
+    n = final_time - initial_time
+
+    change_in_volume = a - af
+    total_time = n + minute_in_hr
+
+    #flow_rate fomula
+    d = change_in_volume / total_time
+
+    New_volumes = []
+
+    Accumulate = []
+
+    Net_to_pump = []
+
+    total = 0
+    value = a
+    batch = b
+    ac = 0
+
+    print("\n*************************Flow Result for",tank,"**********************")
+    
+    print("Start-up Time", initial_time, int(initial_minute), sep=":")
+
+    print("Shut-down Time", final_time, int(final_minute), sep=":")
+
+    print("\nGeneral Flow-Rate Value is", round(d, 4), 'm3/hr', "~~", round(d), 'm3/hr')
+
+    #flow-rate at initial minute
+    fim = (initial_minute / 60) * d
+
+    #flow_rate_at_final_minute
+    ffm = (final_minute / 60) * d
+
+    print("Flow-Rate at Initial Minute of", int(initial_minute),'minute''=', round(fim, 3),
+          'm3/min')
+
+    print("Flow-Rate at Final Minute of", int(final_minute),'minute of', final_time,':',int(final_minute),'=', round(ffm, 4), 'm3/hr',
+          "~~", round(ffm), 'm3/hr')
+
+    print("\nTime(hr), Volume(m3), Flow-rate(m3/hr),             Net-to-Pump(m3),     Accumulation(m3)")
+
+    for i in range(n+1):
+        print( i,"       ","%d " %value,"    ", d, "             ","%d" %batch,"            ", "%d" %ac, )
+        New_volumes.append(value)
+        batch = batch - d
+        total = total + value
+        value = value - d
+        ac = ac + d
+
+        Accumulate.append(d)
+
+        Net_to_pump.append(d)
+
+    Levels = np.divide(New_volumes, f)
+
+    print('\nNew Tank Levels(mm):')
+
+    for l in Levels:
+        print( round(l,3))
+
+    dg = sum(Accumulate)+ fim + ffm
+    print("\nTotal volume of Product Discharged (ACCUMULATION):", round(dg, 4), 'm3')
+
+    rn = b - dg
+    print("\nTotal volume of product remaining(NET To Pump):", round(rn, 4), 'm3')
+
+    bal= dg + rn
+    print("Balance Check of Batch Size:", bal)
+
+    #new level at final minute = af-fmm, volume, net to pump, accumulation
+
+run()
+
